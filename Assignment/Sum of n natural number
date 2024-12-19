@@ -1,0 +1,14 @@
+#include <iostream>
+using namespace std;
+int main() {
+    int N;
+    cout << "Enter a positive integer: ";
+    cin >> N;
+    if (N < 1) {
+        cout << "Please enter a positive integer greater than 0." << endl;
+        return 1; // Exit with error code
+    }
+    int sum = (N * (N + 1)) / 2;
+    cout << "The sum of natural numbers up to " << N << " is: " << sum << endl;
+    return 0;
+}
