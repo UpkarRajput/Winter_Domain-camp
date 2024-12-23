@@ -1,0 +1,141 @@
+#include <iostream>
+#include <string>
+
+struct Passenger {
+    std::string name;
+    Passenger* next;
+
+    Passenger(std::string n) : name(n), next(nullptr) {}
+};
+
+struct Compartment {
+    int totalSeats;
+    int bookedSeats;
+    Passenger* passengerList;
+    Compartment* next;
+
+    Compartment(int seats) : totalSeats(seats), bookedSeats(0), passengerList(nullptr), next(nullptr) {}
+};
+
+class Train {
+private:
+    std::string trainName;
+    Compartment* head;
+
+public:
+    Train(std::string name) : trainName(name), head(nullptr) {}
+
+    void addCompartment(int seats) {
+        Compartment* newComp = new Compartment(seats);
+        newComp->next = head;
+        head = newComp;
+    }
+
+    bool bookSeat(std::string passengerName, int compIndex) {
+        Compartment* current = head;
+        for (int i = 0; i < compIndex && current; i++) {
+            current = current->next;
+        }
+        if (!current || current->bookedSeats >= current->totalSeats) return false;
+
+        Passenger* newPassenger = new Passenger(passengerName);
+        newPassenger->next = current->passengerList;
+        current->passengerList = newPassenger;
+        current->bookedSeats++;
+        return true;
+    }
+
+    void cancelSeat(std::string passengerName, int compIndex) {
+        Compartment* current = head;
+        for (int i = 0; i < compIndex && current; i++) {
+            current = current->next;
+        }
+        if (!current) return;
+
+        Passenger* prev = nullptr;
+        Passenger* temp = current->passengerList;
+        while (temp) {
+            if (temp->name == passengerName) {
+                if (prev) {
+                    prev->next = temp->next;
+                } else {
+                    current->passengerList = temp->next;
+                }
+                delete temp;
+                current->bookedSeats--;
+                return;
+            }
+            prev = temp;
+            temp = temp->next;
+        }
+    }
+
+    void checkAvailability(int compIndex) {
+        Compartment* current = head;
+        for (int i = 0; i < compIndex && current; i++) {
+            current = current->next;
+        }
+        if (current) {
+            std::cout << "Compartment " << compIndex << ": " << current->totalSeats - current->bookedSeats << " seats available." << std::endl;
+        } else {
+            std::cout << "Compartment not found." << std::endl;
+        }
+    }
+
+    void displayPassengers(int compIndex) {
+        Compartment* current = head;
+        for (int i = 0; i < compIndex && current; i++) {
+            current = current->next;
+        }
+        if (current) {
+            Passenger* temp = current->passengerList;
+            std::cout << "Passengers in Compartment " << compIndex << ": ";
+            while (temp) {
+                std::cout << temp->name << " ";
+                temp = temp->next;
+            }
+            std::cout << std::endl;
+        } else {
+            std::cout << "Compartment not found." << std::endl;
+        }
+    }
+
+    ~Train() {
+        while (head) {
+            Compartment* tempComp = head;
+            head = head->next;
+            while (tempComp->passengerList) {
+                Passenger* tempPass = tempComp->passengerList;
+                tempComp->passengerList = tempComp->passengerList->next;
+                delete tempPass;
+            }
+            delete tempComp;
+        }
+    }
+};
+
+int main() {
+    Train train("Express Train");
+    train.addCompartment(5);
+    train.addCompartment(3);
+    train.addCompartment(10);
+
+    train.checkAvailability(0);
+    train.checkAvailability(1);
+    train.checkAvailability(2);
+
+    train.bookSeat("Alice", 0);
+    train.bookSeat("Bob", 0);
+    train.bookSeat("Charlie", 1);
+    train.checkAvailability(0);
+    train.checkAvailability(1);
+
+    train.displayPassengers(0);
+    train.displayPassengers(1);
+
+    train.cancelSeat("Alice", 0);
+    train.checkAvailability(0);
+    train.displayPassengers(0);
+
+    return 0;
+}
