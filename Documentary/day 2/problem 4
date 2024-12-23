@@ -1,0 +1,75 @@
+#include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+
+struct Task {
+    int taskID;
+    int priority;
+    int executionTime;
+    Task* next;
+
+    Task(int id, int prio, int execTime) : taskID(id), priority(prio), executionTime(execTime), next(nullptr) {}
+};
+
+class TaskScheduler {
+private:
+    Task* head;
+
+public:
+    TaskScheduler() : head(nullptr) {}
+
+    void insertTask(int id, int priority, int execTime) {
+        Task* newTask = new Task(id, priority, execTime);
+        if (!head || head->priority < priority) {
+            newTask->next = head;
+            head = newTask;
+        } else {
+            Task* current = head;
+            while (current->next && current->next->priority >= priority) {
+                current = current->next;
+            }
+            newTask->next = current->next;
+            current->next = newTask;
+        }
+    }
+
+    void completeTask() {
+        if (!head) return;
+        Task* temp = head;
+        head = head->next;
+        delete temp;
+    }
+
+    void preemptTask(int id, int priority, int execTime) {
+        completeTask();
+        insertTask(id, priority, execTime);
+    }
+
+    void displayTasks() {
+        Task* current = head;
+        while (current) {
+            std::cout << "Task ID: " << current->taskID << ", Priority: " << current->priority << ", Execution Time: " << current->executionTime << std::endl;
+            current = current->next;
+        }
+    }
+
+    ~TaskScheduler() {
+        while (head) {
+            completeTask();
+        }
+    }
+};
+
+int main() {
+    TaskScheduler scheduler;
+    scheduler.insertTask(1, 2, 5);
+    scheduler.insertTask(2, 1, 3);
+    scheduler.insertTask(3, 3, 2);
+    scheduler.displayTasks();
+    scheduler.completeTask();
+    scheduler.displayTasks();
+    scheduler.preemptTask(4, 4, 1);
+    scheduler.displayTasks();
+    return 0;
+}
