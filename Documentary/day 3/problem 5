@@ -1,0 +1,28 @@
+Minimun  non zero product of an Array Element
+s#include <iostream>
+
+#include <cmath>
+
+const int MOD = 1e9 + 7;
+
+long long minNonZeroProduct(int p) {
+    long long maxNum = (1LL << p) - 1;
+    long long secondMaxNum = maxNum - 1;
+    long long product = (maxNum * secondMaxNum) % MOD;
+    long long remainingCount = (1LL << (p - 1)) - 1; 
+    for (long long i = 1; i <= remainingCount; i++) {
+        product = (product * i) % MOD;
+    }
+
+    return product;
+}
+int main() {
+    int p;
+    std::cout << "Enter the value of p: ";
+    std::cin >> p;
+
+    long long result = minNonZeroProduct(p);
+    std::cout << "The minimum non-zero product is: " << result << std::endl;
+
+    return 0;
+}
