@@ -1,0 +1,29 @@
+Elimination Game
+#include <iostream>
+using namespace std;
+
+class Solution {
+public:
+    int lastRemaining(int n) {
+        int head = 1;
+        int step = 1;
+        bool leftToRight = true;
+        int remaining = n;
+        while (remaining > 1) {
+            if (leftToRight || remaining % 2 == 1) {
+                head += step;
+            }
+            step *= 2;
+            leftToRight = !leftToRight;
+            remaining /= 2;
+        }
+        return head;
+    }
+};
+int main() {
+    Solution solution;
+    int n = 9; 
+    cout << "Last remaining number: " << solution.lastRemaining(n) << endl;
+
+    return 0;
+}
