@@ -1,0 +1,23 @@
+Find The Winner Of Circular Game
+#include <iostream>
+using namespace std;
+int findWinner(int n, int k) {
+    int winner = 0;
+    for (int i = 2; i <= n; i++) {
+        winner = (winner + k) % i; 
+    }
+    return winner + 1; 
+}
+
+int main() {
+    int n, k;
+    cout << "Enter the number of friends (n): ";
+    cin >> n;
+    cout << "Enter the counting step (k): ";
+    cin >> k;
+
+    int winner = findWinner(n, k);
+    cout << "The winner is friend number: " << winner << endl;
+
+    return 0;
+}
