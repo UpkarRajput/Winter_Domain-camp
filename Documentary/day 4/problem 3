@@ -1,0 +1,84 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <unordered_map>
+#include <cmath>
+struct CatalogItem {
+    std::string title;
+    int totalViews;
+    double userRating;
+    int releaseYear;
+    double trendingScore; 
+    CatalogItem(const std::string& t, int views, double rating, int year)
+        : title(t), totalViews(views), userRating(rating), releaseYear(year) {
+        trendingScore = calculateTrendingScore();
+    }
+    double calculateTrendingScore() const {
+        const int currentYear = 2024;
+        double recencyFactor = std::exp(-0.1 * (currentYear - releaseYear));
+        return totalViews * 0.7 + userRating * 50 * recencyFactor;
+    }
+};
+void sortByTrending(std::vector<CatalogItem>& catalog) {
+    std::sort(catalog.begin(), catalog.end(), [](const CatalogItem& a, const CatalogItem& b) {
+        return a.trendingScore > b.trendingScore;
+    });
+}
+void sortByUserRelevance(const std::vector<CatalogItem>& catalog,
+                         const std::unordered_map<std::string, int>& userHistory,
+                         std::vector<CatalogItem>& recommendations) {
+    for (const auto& item : catalog) {
+        double relevanceScore = item.trendingScore;
+
+        // Adjust relevance score based on user's viewing history
+        auto it = userHistory.find(item.title);
+        if (it != userHistory.end()) {
+            relevanceScore += it->second * 20; 
+        }
+        CatalogItem personalizedItem = item;
+        personalizedItem.trendingScore = relevanceScore;
+        recommendations.push_back(personalizedItem);
+    }
+    std::sort(recommendations.begin(), recommendations.end(), [](const CatalogItem& a, const CatalogItem& b) {
+        return a.trendingScore > b.trendingScore;
+    });
+}
+
+int main() {
+    std::vector<CatalogItem> catalog = {
+        {"Movie A", 100000, 4.8, 2022},
+        {"TV Show B", 200000, 4.5, 2020},
+        {"Movie C", 150000, 4.2, 2024},
+        {"TV Show D", 50000, 4.7, 2023},
+        {"Movie E", 300000, 4.3, 2019}
+    };
+    sortByTrending(catalog);
+
+    std::cout << "Trending Catalog:\n";
+    for (const auto& item : catalog) {
+        std::cout << "Title: " << item.title
+                  << ", Views: " << item.totalViews
+                  << ", Rating: " << item.userRating
+                  << ", Year: " << item.releaseYear
+                  << ", Trending Score: " << item.trendingScore << '\n';
+    }
+    std::unordered_map<std::string, int> userHistory = {
+        {"Movie A", 3},
+        {"TV Show B", 5}
+    };
+
+    std::vector<CatalogItem> recommendations;
+    sortByUserRelevance(catalog, userHistory, recommendations);
+
+    std::cout << "\nPersonalized Recommendations:\n";
+    for (const auto& item : recommendations) {
+        std::cout << "Title: " << item.title
+                  << ", Views: " << item.totalViews
+                  << ", Rating: " << item.userRating
+                  << ", Year: " << item.releaseYear
+                  << ", Personalized Score: " << item.trendingScore << '\n';
+    }
+
+    return 0;
+}
