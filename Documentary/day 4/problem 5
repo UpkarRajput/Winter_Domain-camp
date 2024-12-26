@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <algorithm>
+struct Advertisement {
+    std::string advertiser;
+    double bidAmount;   
+    double engagementRate; 
+    double remainingBudget; 
+    Advertisement(const std::string& adv, double bid, double engage, double budget)
+        : advertiser(adv), bidAmount(bid), engagementRate(engage), remainingBudget(budget) {}
+    double calculatePriority() const {
+        return bidAmount * engagementRate * std::min(remainingBudget, 1.0);
+    }
+};
+struct AdComparator {
+    bool operator()(const Advertisement& a, const Advertisement& b) {
+        return a.calculatePriority() < b.calculatePriority(); 
+    }
+};
+class AdScheduler {
+private:
+    std::priority_queue<Advertisement, std::vector<Advertisement>, AdComparator> adQueue;
+
+public:
+    void addAd(const std::string& advertiser, double bidAmount, double engagementRate, double remainingBudget) {
+        Advertisement newAd(advertiser, bidAmount, engagementRate, remainingBudget);
+        adQueue.push(newAd);
+    }
+    void scheduleNextAd() {
+        if (adQueue.empty()) {
+            std::cout << "No ads to schedule.\n";
+            return;
+        }
+
+        Advertisement nextAd = adQueue.top();
+        adQueue.pop();
+
+        std::cout << "Scheduling ad for advertiser: " << nextAd.advertiser
+                  << " | Bid: " << nextAd.bidAmount
+                  << " | Engagement Rate: " << nextAd.engagementRate
+                  << " | Remaining Budget: " << nextAd.remainingBudget
+                  << " | Priority: " << nextAd.calculatePriority() << "\n";
+    }
+    void displayQueue() {
+        if (adQueue.empty()) {
+            std::cout << "No ads in the queue.\n";
+            return;
+        }
+        auto tempQueue = adQueue;
+
+        std::cout << "\nAds in queue:\n";
+        while (!tempQueue.empty()) {
+            Advertisement ad = tempQueue.top();
+            tempQueue.pop();
+
+            std::cout << "Advertiser: " << ad.advertiser
+                      << " | Bid: " << ad.bidAmount
+                      << " | Engagement Rate: " << ad.engagementRate
+                      << " | Remaining Budget: " << ad.remainingBudget
+                      << " | Priority: " << ad.calculatePriority() << "\n";
+        }
+    }
+};
+
+int main() {
+    AdScheduler scheduler;
+    scheduler.addAd("Advertiser A", 5.0, 0.8, 100.0);
+    scheduler.addAd("Advertiser B", 4.5, 0.9, 50.0);
+    scheduler.addAd("Advertiser C", 6.0, 0.7, 10.0);
+    scheduler.addAd("Advertiser D", 3.0, 0.6, 200.0);
+    scheduler.displayQueue();
+    std::cout << "\nScheduling ads:\n";
+    scheduler.scheduleNextAd();
+    scheduler.scheduleNextAd();
+    scheduler.displayQueue();
+    scheduler.addAd("Advertiser E", 7.0, 0.5, 20.0);
+    scheduler.displayQueue();
+
+    return 0;
+}
