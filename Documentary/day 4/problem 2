@@ -1,0 +1,81 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <map>
+#include <chrono>
+struct Trade {
+    std::string timestamp;
+    std::string stockSymbol;
+    double tradePrice;
+    int tradeVolume;
+    Trade(const std::string& t, const std::string& s, double p, int v)
+        : timestamp(t), stockSymbol(s), tradePrice(p), tradeVolume(v) {}
+};
+void sortByTimestamp(std::vector<Trade>& trades) {
+    std::sort(trades.begin(), trades.end(), [](const Trade& a, const Trade& b) {
+        return a.timestamp < b.timestamp;
+    });
+}
+
+void sortByStockSymbol(std::vector<Trade>& trades) {
+    std::sort(trades.begin(), trades.end(), [](const Trade& a, const Trade& b) {
+        return a.stockSymbol < b.stockSymbol;
+    });
+}
+std::map<std::string, std::vector<Trade>> groupByVolume(const std::vector<Trade>& trades) {
+    std::map<std::string, std::vector<Trade>> groupedTrades;
+
+    for (const auto& trade : trades) {
+        groupedTrades[trade.stockSymbol].push_back(trade);
+    }
+
+    return groupedTrades;
+}
+int main() {
+    std::vector<Trade> trades = {
+        {"2024-12-26T10:00:01", "AAPL", 175.5, 1000},
+        {"2024-12-26T10:00:02", "GOOGL", 2890.1, 200},
+        {"2024-12-26T10:00:01", "MSFT", 340.2, 500},
+        {"2024-12-26T10:00:03", "AAPL", 176.0, 1500},
+        {"2024-12-26T10:00:04", "GOOGL", 2895.0, 300}
+    };
+    auto start = std::chrono::high_resolution_clock::now();
+    sortByTimestamp(trades);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Sorted by Timestamp in " << elapsed.count() << " seconds." << std::endl;
+    std::cout << "\nTrades sorted by Timestamp:\n";
+    for (const auto& trade : trades) {
+        std::cout << "Timestamp: " << trade.timestamp
+                  << ", Symbol: " << trade.stockSymbol
+                  << ", Price: " << trade.tradePrice
+                  << ", Volume: " << trade.tradeVolume << '\n';
+    }
+    start = std::chrono::high_resolution_clock::now();
+    sortByStockSymbol(trades);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "\nSorted by Stock Symbol in " << elapsed.count() << " seconds." << std::endl;
+
+    // Display sorted trades
+    std::cout << "\nTrades sorted by Stock Symbol:\n";
+    for (const auto& trade : trades) {
+        std::cout << "Timestamp: " << trade.timestamp
+                  << ", Symbol: " << trade.stockSymbol
+                  << ", Price: " << trade.tradePrice
+                  << ", Volume: " << trade.tradeVolume << '\n';
+    }
+    auto groupedTrades = groupByVolume(trades);
+    std::cout << "\nGrouped Trades by Volume Trends:\n";
+    for (const auto& pair : groupedTrades) {
+        std::cout << "\nStock Symbol: " << pair.first << '\n';
+        for (const auto& trade : pair.second) {
+            std::cout << "  Timestamp: " << trade.timestamp
+                      << ", Price: " << trade.tradePrice
+                      << ", Volume: " << trade.tradeVolume << '\n';
+        }
+    }
+
+    return 0;
+}
