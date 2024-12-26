@@ -1,0 +1,78 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <queue>
+struct Patient {
+    std::string name;
+    int triagePriority; 
+    int severity;     
+    int arrivalTime;    
+    Patient(const std::string& n, int tp, int s, int at)
+        : name(n), triagePriority(tp), severity(s), arrivalTime(at) {}
+};
+struct PatientComparator {
+    bool operator()(const Patient& a, const Patient& b) {
+        if (a.triagePriority != b.triagePriority)
+            return a.triagePriority > b.triagePriority; 
+        if (a.severity != b.severity)
+            return a.severity > b.severity; 
+        return a.arrivalTime > b.arrivalTime; 
+    }
+};
+class HospitalSystem {
+private:
+    std::priority_queue<Patient, std::vector<Patient>, PatientComparator> patientQueue;
+
+public:
+    void addPatient(const std::string& name, int triagePriority, int severity, int arrivalTime) {
+        Patient newPatient(name, triagePriority, severity, arrivalTime);
+        patientQueue.push(newPatient);
+    }
+    void processNextPatient() {
+        if (patientQueue.empty()) {
+            std::cout << "No patients in the queue.\n";
+            return;
+        }
+        Patient nextPatient = patientQueue.top();
+        patientQueue.pop();
+        std::cout << "Processing patient: " << nextPatient.name
+                  << " | Priority: " << nextPatient.triagePriority
+                  << " | Severity: " << nextPatient.severity
+                  << " | Arrival Time: " << nextPatient.arrivalTime << "\n";
+    }
+    void displayQueue() {
+        if (patientQueue.empty()) {
+            std::cout << "No patients in the queue.\n";
+            return;
+        }
+        auto tempQueue = patientQueue;
+        std::cout << "\nPatients in queue:\n";
+        while (!tempQueue.empty()) {
+            Patient patient = tempQueue.top();
+            tempQueue.pop();
+
+            std::cout << "Name: " << patient.name
+                      << " | Priority: " << patient.triagePriority
+                      << " | Severity: " << patient.severity
+                      << " | Arrival Time: " << patient.arrivalTime << "\n";
+        }
+    }
+};
+
+int main() {
+    HospitalSystem hospital;
+    hospital.addPatient("John Doe", 2, 3, 1);
+    hospital.addPatient("Jane Smith", 1, 5, 2);
+    hospital.addPatient("Alice Brown", 3, 2, 3);
+    hospital.addPatient("Bob White", 1, 1, 4);
+    hospital.displayQueue();
+    std::cout << "\nProcessing patients:\n";
+    hospital.processNextPatient();
+    hospital.processNextPatient();
+    hospital.displayQueue();
+    hospital.addPatient("Eve Black", 1, 4, 5);
+    hospital.displayQueue();
+
+    return 0;
+}
