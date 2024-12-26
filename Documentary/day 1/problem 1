@@ -1,0 +1,26 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    // Personal and academic details
+    string name = "Upkar Singh";  
+    string roll_no = "22BCS10063";  
+    char section = 'A';  
+    string area_of_interest = "Computer Science Engineering";  
+    int age = 20;  
+    float last_year_CGPA = 7.7; 
+    string date_of_birth = "15th September 2005";  
+    string hometown = "Chandigarh";  
+    string aim_in_life = "To become a softaware engineering";  
+    cout << "---- Academic Bio-Data ----" << endl;
+    cout << "Name: " << name << endl;
+    cout << "Roll No.: " << roll_no << endl;
+    cout << "Section: " << section << endl;
+    cout << "Area of Interest: " << area_of_interest << endl;
+    cout << "Age: " << age << endl;
+    cout << "Last Year CGPA: " << last_year_CGPA << endl;
+    cout << "Date of Birth: " << date_of_birth << endl;
+    cout << "Hometown: " << hometown << endl;
+    cout << "Aim in Life: " << aim_in_life << endl;
+    return 0;
+}
