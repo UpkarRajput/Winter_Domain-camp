@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <chrono>
+struct Transaction {
+    std::string transactionID;
+    double size;
+    double frequency; 
+    double geographicalRisk; 
+    double suspiciousnessScore; 
+    Transaction(const std::string& id, double s, double f, double g)
+        : transactionID(id), size(s), frequency(f), geographicalRisk(g) {
+        suspiciousnessScore = calculateSuspiciousness();
+    }
+    double calculateSuspiciousness() const {
+        return size * 0.5 + frequency * 0.3 + geographicalRisk * 0.2;
+    }
+};
+void sortTransactions(std::vector<Transaction>& transactions) {
+    std::sort(transactions.begin(), transactions.end(), [](const Transaction& a, const Transaction& b) {
+        return a.suspiciousnessScore > b.suspiciousnessScore;
+    });
+}
+int main() {
+    std::vector<Transaction> transactions = {
+        {"TXN001", 1200.5, 3, 0.8},
+        {"TXN002", 500, 10, 0.5},
+        {"TXN003", 2000, 1, 0.9},
+        {"TXN004", 150, 20, 0.3},
+        {"TXN005", 3000, 0.5, 0.95}
+    };
+    auto start = std::chrono::high_resolution_clock::now();
+    sortTransactions(transactions);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Sorted Transactions by Suspiciousness Score:\n";
+    for (const auto& txn : transactions) {
+        std::cout << "TransactionID: " << txn.transactionID
+                  << ", Score: " << txn.suspiciousnessScore
+                  << ", Size: " << txn.size
+                  << ", Frequency: " << txn.frequency
+                  << ", GeographicalRisk: " << txn.geographicalRisk
+                  << '\n';
+    }
+    std::cout << "\nSorting completed in " << elapsed.count() << " seconds." << std::endl;
+
+    return 0;
+}
